@@ -22,7 +22,7 @@ soup = BeautifulSoup(html, "html.parser")
 rows = soup.select("table.wikitable tbody tr")
 print(f"✅ Found {len(rows)} card rows")
 
-downloaded = 0
+downloaded = 1
 for row in rows:
     cols = row.find_all("td")
     if len(cols) < 2:
@@ -47,9 +47,12 @@ for row in rows:
     if "_thumbnail.png" not in img_url:
         continue
 
-    original_name = os.path.basename(img_url)
-    clean_name = original_name.replace("64px-", "")
-    filename = os.path.join(save_dir, clean_name)
+    original_name = os.path.basename(img_url).replace("64px-", "")  # e.g., Ichika_1_thumbnail.png
+    name_only = original_name.replace("_thumbnail.png", "")         # → Ichika_1
+    name_parts = name_only.split("_")                               # → ["Ichika", "1"]
+    new_filename = f"thumbnail-{name_parts[0].lower()}-{name_parts[1]}.png"
+    filename = os.path.join(save_dir, new_filename)
+
 
     try:
         img_response = requests.get(img_url, headers={"User-Agent": "Mozilla/5.0"})
